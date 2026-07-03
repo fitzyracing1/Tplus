@@ -1,9 +1,20 @@
-REPLACE THIS with the task you want every agent to perform, for example:
+Get this repository's program running.
 
-"Add a GitHub Actions CI workflow that installs dependencies and runs the test
-suite on every push and pull request. If the repo has no tests, add a minimal
-smoke test. Open a pull request with the changes."
+1. Identify the main program in this repository: what it is, what language and
+   framework it uses, and how it is meant to be started.
+2. Install whatever dependencies it needs, then build and run it.
+3. If it fails to build or run, fix the errors until the program starts and
+   runs without crashing. Keep the fixes minimal — make it work, don't
+   redesign it.
+4. Verify it actually runs: for a web app, confirm the server starts and
+   responds; for a CLI or script, run it and confirm sensible output; for a
+   library, run its tests or a small usage example.
+5. Update the README with exact, tested instructions for installing
+   dependencies and running the program.
+6. Open a pull request with any fixes and the updated README. In the PR
+   description, state what the program is, what was broken, what you fixed,
+   and how you verified it runs.
 
-Every launched agent receives this exact text as its instructions, so write it
-the way you would write a task for a teammate: what to do, what "done" looks
-like, and any constraints.
+If the repository has no runnable program (for example, it only contains data,
+notes, or backups), don't invent one — just open a PR that updates the README
+to state what the repository contains.
