@@ -203,15 +203,22 @@ def cmd_status(args):
     if not state:
         sys.exit(f"No launches recorded in {STATE_FILE} yet.")
     width = max(len(e["repo"]) for e in state)
+    counts = {}
     for entry in state:
         try:
+            # Agent status only says whether the agent is archived; the latest
+            # run's status is what tells us if the work is done.
+            runs = request("GET", f"/agents/{entry['agentId']}/runs?limit=1")
+            items = runs.get("items", [])
+            status = items[0].get("status", "?") if items else "NO_RUNS"
             agent = request("GET", f"/agents/{entry['agentId']}")
-            status = agent.get("status", "?")
             branches = agent.get("git", {}).get("branches") or []
             extra = f"  branch: {branches[0]}" if branches else ""
         except RuntimeError as e:
             status, extra = "ERROR", f"  {e}"
-        print(f"{entry['repo']:<{width}}  {entry['agentId']}  {status}{extra}")
+        counts[status] = counts.get(status, 0) + 1
+        print(f"{entry['repo']:<{width}}  {entry['agentId']}  {status}{extra}", flush=True)
+    print("\nSummary: " + ", ".join(f"{v} {k}" for k, v in sorted(counts.items())))
 
 
 def main():
