@@ -163,23 +163,36 @@ def cmd_launch(args):
         }
         if args.model:
             body["model"] = {"id": args.model}
-        try:
-            resp = request("POST", "/agents", body)
-            agent = resp.get("agent", resp)
-            agent_id = agent.get("id", "?")
-            print(f"launched {agent_id}: {url}")
-            state.append(
-                {
-                    "repo": url,
-                    "agentId": agent_id,
-                    "launchedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-                }
-            )
-            save_state(state)
-            launched += 1
-        except RuntimeError as e:
-            print(f"FAILED {url}: {e}", file=sys.stderr)
-            failed += 1
+        while True:
+            try:
+                resp = request("POST", "/agents", body)
+                agent = resp.get("agent", resp)
+                agent_id = agent.get("id", "?")
+                print(f"launched {agent_id}: {url}", flush=True)
+                state.append(
+                    {
+                        "repo": url,
+                        "agentId": agent_id,
+                        "launchedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                    }
+                )
+                save_state(state)
+                launched += 1
+                break
+            except RuntimeError as e:
+                # Plans cap how many Cloud Agents may run simultaneously. When the
+                # cap is hit, wait for running agents to finish and retry the same
+                # repo instead of failing it.
+                if "reached the limit" in str(e) or "Upgrade to Ultra" in str(e):
+                    print(
+                        f"concurrency limit reached; waiting {args.wait}s for a free slot ...",
+                        flush=True,
+                    )
+                    time.sleep(args.wait)
+                    continue
+                print(f"FAILED {url}: {e}", file=sys.stderr, flush=True)
+                failed += 1
+                break
         time.sleep(args.delay)
     print(f"\nDone: {launched} launched, {failed} failed, {skipped} skipped.")
     print(f"Agent IDs recorded in {STATE_FILE}. Track them with `python3 fleet.py status`.")
@@ -215,6 +228,12 @@ def main():
     p_launch.add_argument("--model", help="model id, e.g. composer-2 (default: your Cursor default)")
     p_launch.add_argument("--no-pr", action="store_true", help="don't auto-create PRs")
     p_launch.add_argument("--delay", type=float, default=2.0, help="seconds between launches (default: 2)")
+    p_launch.add_argument(
+        "--wait",
+        type=float,
+        default=120.0,
+        help="seconds to wait when the plan's concurrent-agent limit is hit (default: 120)",
+    )
     p_launch.add_argument(
         "--skip-launched",
         action="store_true",
