@@ -65,10 +65,10 @@ def request(method, path, body=None):
                 time.sleep(wait)
                 continue
             raise RuntimeError(f"{method} {path} failed ({e.code}): {detail}") from e
-        except urllib.error.URLError as e:
+        except (urllib.error.URLError, TimeoutError, OSError) as e:
             if attempt < 4:
                 wait = 2 ** (attempt + 2)
-                print(f"  network error ({e.reason}), retrying in {wait}s ...", file=sys.stderr)
+                print(f"  network error ({e}), retrying in {wait}s ...", file=sys.stderr)
                 time.sleep(wait)
                 continue
             raise
@@ -190,6 +190,17 @@ def cmd_launch(args):
                     )
                     time.sleep(args.wait)
                     continue
+                if "usage_limit_exceeded" in str(e):
+                    print(
+                        f"\nSTOPPED: the account is out of budget for Cloud Agents.\n{e}\n"
+                        "Enable usage-based pricing / raise the spend limit at "
+                        "cursor.com/dashboard -> Settings, then resume with:\n"
+                        "  python3 fleet.py launch --yes --skip-launched",
+                        file=sys.stderr,
+                        flush=True,
+                    )
+                    print(f"\nDone so far: {launched} launched, {failed} failed, {skipped} skipped.")
+                    return
                 print(f"FAILED {url}: {e}", file=sys.stderr, flush=True)
                 failed += 1
                 break
