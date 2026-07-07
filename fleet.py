@@ -191,6 +191,14 @@ def cmd_launch(args):
                     time.sleep(args.wait)
                     continue
                 if "usage_limit_exceeded" in str(e):
+                    if args.budget_wait:
+                        print(
+                            f"spend limit reached; retrying in {args.budget_wait}s "
+                            "(raise it at cursor.com/dashboard -> Settings) ...",
+                            flush=True,
+                        )
+                        time.sleep(args.budget_wait)
+                        continue
                     print(
                         f"\nSTOPPED: the account is out of budget for Cloud Agents.\n{e}\n"
                         "Enable usage-based pricing / raise the spend limit at "
@@ -251,6 +259,12 @@ def main():
         type=float,
         default=120.0,
         help="seconds to wait when the plan's concurrent-agent limit is hit (default: 120)",
+    )
+    p_launch.add_argument(
+        "--budget-wait",
+        type=float,
+        default=0,
+        help="if set, retry every N seconds when the spend limit is hit instead of stopping",
     )
     p_launch.add_argument(
         "--skip-launched",
