@@ -1,20 +1,23 @@
-Get this repository's program running.
+Complete this project. Your goal is to figure out what this repository is
+trying to become, and finish it.
 
-1. Identify the main program in this repository: what it is, what language and
-   framework it uses, and how it is meant to be started.
-2. Install whatever dependencies it needs, then build and run it.
-3. If it fails to build or run, fix the errors until the program starts and
-   runs without crashing. Keep the fixes minimal — make it work, don't
-   redesign it.
-4. Verify it actually runs: for a web app, confirm the server starts and
-   responds; for a CLI or script, run it and confirm sensible output; for a
-   library, run its tests or a small usage example.
-5. Update the README with exact, tested instructions for installing
-   dependencies and running the program.
-6. Open a pull request with any fixes and the updated README. In the PR
-   description, state what the program is, what was broken, what you fixed,
-   and how you verified it runs.
+1. Study the repository — code, README, TODOs, half-built features, commit
+   history — and work out the project's ambition: what would this project look
+   like if it were finished and working as its author intended?
+2. Write down that ambition in one or two sentences at the top of the README,
+   then make it real:
+   - Finish incomplete features and half-built functionality.
+   - Fix anything broken so the whole project builds and runs.
+   - Fill the gaps a finished project needs: error handling where it matters,
+     a coherent structure, and a README that explains what the project is and
+     exactly how to install, run, and use it.
+3. Verify everything actually works: run the program, exercise its main
+   features, and run or add tests that prove the core behavior.
+4. Open a pull request describing: the project's ambition as you understood
+   it, what was missing or broken, everything you completed, and how you
+   verified it works.
 
-If the repository has no runnable program (for example, it only contains data,
-notes, or backups), don't invent one — just open a PR that updates the README
-to state what the repository contains.
+Stay true to the project's own goal — complete what it was trying to be, don't
+turn it into something else. If the repository is not a project at all (only
+backups, data dumps, or config snapshots), don't invent one: open a PR that
+updates the README to state clearly what the repository contains.
